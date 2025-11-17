@@ -12,12 +12,7 @@ package system_consts;
     parameter int SSIDX_PRIORITY = 10;
     parameter int SSIDX_190FMC = 11;
     parameter int SSIDX_CCHIP_RAM = 12;
-    parameter int SSIDX_PIVOT_CTRL = 13;
-    parameter int SSIDX_PIVOT_RAM = 14;
-    parameter int SSIDX_SCN_MUX_RAM = 15;
-    parameter int SSIDX_SCN_1 = 16;
-    parameter int SSIDX_480SCP = 17;
-    parameter int SSIDX_KOSHIEN = 18;
+    parameter int SSIDX_SHARE_RAM = 13;
 
 
     parameter bit [31:0] SS_DDR_BASE       = 32'h3E00_0000;
@@ -73,37 +68,7 @@ package system_consts;
     };
 
     typedef enum bit [7:0] {
-        GAME_FINALB,
-        GAME_DONDOKOD,
-        GAME_MEGAB,
-        GAME_THUNDFOX,
-        GAME_CAMELTRY,
-        GAME_QTORIMON,
-        GAME_LIQUIDK,
-        GAME_QUIZHQ,
-        GAME_SSI,
-        GAME_GUNFRONT,
-        GAME_GROWL,
-        GAME_MJNQUEST,
-        GAME_FOOTCHMP,
-        GAME_KOSHIEN,
-        GAME_YUYUGOGO,
-        GAME_NINJAK,
-        GAME_SOLFIGTR,
-        GAME_QZQUEST,
-        GAME_PULIRULA,
-        GAME_METALB,
-        GAME_QZCHIKYU,
-        GAME_YESNOJ,
-        GAME_DEADCONX,
-        GAME_DINOREX,
-        GAME_QJINSEI,
-        GAME_QCRAYON,
-        GAME_QCRAYON2,
-        GAME_DRIFTOUT,
-        GAME_DEADCONXJ,
-        GAME_METALBA,
-        GAME_HTHERO
+        GAME_CADASH
     } game_t;
 
     typedef struct packed {

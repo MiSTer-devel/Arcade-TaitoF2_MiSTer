@@ -21,17 +21,15 @@ class GfxCache;
 enum class MemoryRegion : int
 {
     SCN_0 = 0,
-    SCN_MUX,
     COLOR,
     OBJ,
     WORK,
-    PIVOT,
+    SHARE,
     OBJ_EXT,
     SOUND,
     CPU_ROM,
     SOUND_ROM,
     SCN0_ROM,
-    SCN1_ROM,
     OBJ_ROM,
 
     COUNT

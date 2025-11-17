@@ -104,9 +104,9 @@ class GfxCache
 
         entry->mHash = hash;
 
-        bool dar260 = G_F2_SIGNAL(cfg_260dar);
-        bool bpp15 = G_F2_SIGNAL(cfg_bpp15);
-        bool bppmix = G_F2_SIGNAL(cfg_bppmix);
+        bool dar260 = false; //G_F2_SIGNAL(cfg_260dar);
+        bool bpp15 = false; // G_F2_SIGNAL(cfg_bpp15);
+        bool bppmix = false; //G_F2_SIGNAL(cfg_bppmix);
 
         for (int i = 0; i < 16; i++)
         {

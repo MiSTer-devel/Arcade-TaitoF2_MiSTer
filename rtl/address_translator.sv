@@ -11,8 +11,8 @@ module address_translator(
     input [15:0] cfg_addr_rom1,
     input [15:0] cfg_addr_extra_rom,
     input [15:0] cfg_addr_work_ram,
+    input [15:0] cfg_addr_share_ram,
     input [15:0] cfg_addr_screen0,
-    input [15:0] cfg_addr_screen1,
     input [15:0] cfg_addr_obj,
     input [15:0] cfg_addr_color,
     input [15:0] cfg_addr_io0,
@@ -20,14 +20,13 @@ module address_translator(
     input [15:0] cfg_addr_sound,
     input [15:0] cfg_addr_extension,
     input [15:0] cfg_addr_priority,
-    input [15:0] cfg_addr_roz,
     input [15:0] cfg_addr_cchip,
 
     output logic WORKn,
     output logic ROMn,
+    output logic SHAREn,
     output logic EXTRA_ROMn,
     output logic SCREEN0n,
-    output logic SCREEN1n,
     output logic COLORn,
     output logic IO0n,
     output logic IO1n,
@@ -37,7 +36,6 @@ module address_translator(
     output logic EXTENSIONn,
     output logic CCHIPn,
     output logic GROWL_HACKn,
-    output logic PIVOTn,
     output logic SS_SAVEn,
     output logic SS_RESETn,
     output logic SS_VECn
@@ -56,8 +54,8 @@ always_comb begin
     WORKn = 1;
     ROMn = 1;
     EXTRA_ROMn = 1;
+    SHAREn = 1;
     SCREEN0n = 1;
-    SCREEN1n = 1;
     COLORn = 1;
     PRIORITYn = 1;
     IO0n = 1;
@@ -70,7 +68,6 @@ always_comb begin
     EXTENSIONn = 1;
     GROWL_HACKn = 1;
     CCHIPn = 1;
-    PIVOTn = 1;
 
     if (ss_override) begin
         if (~&cpu_ds_n) begin
@@ -97,8 +94,8 @@ always_comb begin
                 & match_addr_n(cpu_word_addr, cfg_addr_extra_rom);
         EXTRA_ROMn = match_addr_n(cpu_word_addr, cfg_addr_extra_rom);
         WORKn = match_addr_n(cpu_word_addr, cfg_addr_work_ram);
+        SHAREn = match_addr_n(cpu_word_addr, cfg_addr_share_ram);
         SCREEN0n = match_addr_n(cpu_word_addr, cfg_addr_screen0);
-        SCREEN1n = match_addr_n(cpu_word_addr, cfg_addr_screen1);
         OBJECTn = match_addr_n(cpu_word_addr, cfg_addr_obj);
         COLORn = match_addr_n(cpu_word_addr, cfg_addr_color);
         IO0n = match_addr_n(cpu_word_addr, cfg_addr_io0);
@@ -107,11 +104,6 @@ always_comb begin
         EXTENSIONn = match_addr_n(cpu_word_addr, cfg_addr_extension);
         PRIORITYn = match_addr_n(cpu_word_addr, cfg_addr_priority);
         CCHIPn = match_addr_n(cpu_word_addr, cfg_addr_cchip);
-        PIVOTn = match_addr_n(cpu_word_addr, cfg_addr_roz);
-
-        if (game == GAME_GROWL) begin
-            GROWL_HACKn = ~(cpu_word_addr[23:16] == 8'h50 && cpu_word_addr[15]);
-        end
     end
 end
 /* verilator lint_on CASEX */

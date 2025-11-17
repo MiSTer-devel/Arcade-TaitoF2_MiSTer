@@ -318,8 +318,7 @@ class ROMWindow : public Window
         mTabs.clear();
         mTabs.emplace_back("CPU", gSimCore.Memory(MemoryRegion::CPU_ROM));
         mTabs.emplace_back("Sound", gSimCore.Memory(MemoryRegion::SOUND_ROM));
-        mTabs.emplace_back("SCN0", gSimCore.Memory(MemoryRegion::SCN0_ROM));
-        mTabs.emplace_back("SCN1", gSimCore.Memory(MemoryRegion::SCN1_ROM));
+        mTabs.emplace_back("SCN", gSimCore.Memory(MemoryRegion::SCN0_ROM));
         mTabs.emplace_back("OBJ", gSimCore.Memory(MemoryRegion::OBJ_ROM));
     }
 
@@ -365,12 +364,10 @@ class RAMWindow : public Window
     {
         mTabs.clear();
         mTabs.emplace_back("Work", gSimCore.Memory(MemoryRegion::WORK));
+        mTabs.emplace_back("Share", gSimCore.Memory(MemoryRegion::SHARE));
         mTabs.emplace_back("Screen", gSimCore.Memory(MemoryRegion::SCN_0));
-        mTabs.emplace_back("Screen Mux", gSimCore.Memory(MemoryRegion::SCN_MUX));
         mTabs.emplace_back("Color", gSimCore.Memory(MemoryRegion::COLOR));
-        mTabs.emplace_back("Pivot", gSimCore.Memory(MemoryRegion::PIVOT));
         mTabs.emplace_back("OBJ", gSimCore.Memory(MemoryRegion::OBJ));
-        mTabs.emplace_back("OBJ Extension", gSimCore.Memory(MemoryRegion::OBJ_EXT));
         mTabs.emplace_back("Sound", gSimCore.Memory(MemoryRegion::SOUND));
     }
 

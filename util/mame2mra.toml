@@ -13,62 +13,11 @@ tc0480scp = 7
 extra = 8
 
 [machines]
-finalb = "00 00"
-dondokod = "01 00"
-megablst = "02 00"
-thundfox = "03 00"
-cameltry = "04 00"
-qtorimon = "05 00"
-liquidk = "06 00"
-quizhq = "07 00"
-ssi = "08 00"
-gunfront = "09 00"
-growl = "0a 00"
-#mjnquest = "0b 00"
-footchmp = "0c 00"
-euroch92 = "0c 00"
-koshien = "0d 00"
-#yuyugogo = "0e 00"
-ninjak = "0f 00"
-solfigtr = "10 00"
-qzquest = "11 00"
-pulirula = "12 00"
-metalb = "13 00"
-qzchikyu = "14 00"
-#yesnoj = "15 00"
-deadconx = "16 00"
-dinorex = "17 00"
-qjinsei = "18 00"
-qcrayon = "19 00"
-qcrayon2 = "1a 00"
-driftout = "1b 00"
+cadash = "00 00"
 
 [buttons]
 default.snes = "B,A,X,Y,Start,Select,L,R"
 default.game = "Btn1,Btn2,Btn3,Btn4,-,-,Start,Coin,Pause,SS"
-finalb = { snes = "B,A,X,Start,Select,L,R", game = "Punch A,Punch B,Duck,-,-,-,Start,Coin,Pause,SS" }
-dondokod = { snes = "B,A,Start,Select,L,R", game = "Attack,Jump,-,-,-,-,Start,Coin,Pause,SS" }
-megablst = { snes = "B,Start,Select,L,R", game = "Attack,-,-,-,-,-,Start,Coin,Pause,SS" }
-thundfox = { snes = "B,A,X,Start,Select,L,R", game = "Attack,Jump,Item,-,-,-,Start,Coin,Pause,SS" }
-cameltry = { snes = "B,Start,Select,L,R", game = "Shake,-,-,-,-,-,Start,Coin,Pause,SS" }
-liquidk = { snes = "B,A,Start,Select,L,R", game = "Attack,Jump,-,-,-,-,Start,Coin,Pause,SS" }
-quizhq = { snes = "B,A,X,Y,-,Start,Select,L,R", game = "1,2,3,4,5,-,Start,Coin,Pause,SS" }
-ssi = { snes = "B,A,Start,Select,L,R", game = "Shoot,Use Item,-,-,-,-,Start,Coin,Pause,SS" }
-gunfront = { snes = "B,A,Start,Select,L,R", game = "Shoot,Bomb,-,-,-,-,Start,Coin,Pause,SS" }
-growl = { snes = "B,A,Start,Select,L,R", game = "Attack,Jump,-,-,-,-,Start,Coin,Pause,SS" }
-
-koshien = { snes = "B,A,X,Start,Select,L,R", game = "Charge,Throw,Run,-,-,-,Start,Coin,Pause,SS" }
-ninjak = { snes = "B,A,Start,Select,L,R", game = "Attack,Jump,-,-,-,-,Start,Coin,Pause,SS" }
-solfigtr = { snes = "B,A,X,Start,Select,L,R", game = "Punch,Kick,Jump,-,-,-,Start,Coin,Pause,SS" }
-
-pulirula = { snes = "B,A,X,Start,Select,L,R", game = "Attack,Jump,Magic,-,-,-,Start,Coin,Pause,SS" }
-metalb = { snes = "B,A,Start,Select,L,R", game = "Attack,Special,-,-,-,-,Start,Coin,Pause,SS" }
-deadconx = { snes = "B,A,Start,Select,L,R", game = "Fire,Dive,-,-,-,-,Start,Coin,Pause,SS" }
-
-dinorex = { snes = "B,A,Start,Select,L,R", game = "Bite/Punch,Kick,-,-,-,-,Start,Coin,Pause,SS" }
-driftout = { snes = "B,A,Start,Select,L,R", game = "Accelerator,Brake,-,-,-,-,Start,Coin,Pause,SS" }
-footchmp = { snes = "B,A,Start,Select,L,R", game = "Shoot/Slide,Pass/Rough,-,-,-,-,Start,Coin,Pause,SS" }
-euroch92 = { snes = "B,A,Start,Select,L,R", game = "Shoot/Slide,Pass/Rough,-,-,-,-,Start,Coin,Pause,SS" }
 
 
 [pretty_names]

@@ -53,17 +53,15 @@ void SimCore::Init()
     mGfxCache = std::make_unique<GfxCache>();
 
     SetMemory(MemoryRegion::SCN_0, unique_memory_16b(scn_ram_0, 64 * 1024));
-    SetMemory(MemoryRegion::SCN_MUX, unique_memory_16b(scn_mux_ram, 64 * 1024));
     SetMemory(MemoryRegion::COLOR, unique_memory_16b(color_ram, 16 * 1024));
     SetMemory(MemoryRegion::OBJ, unique_memory_16b(obj_ram, 64 * 1024));
-    SetMemory(MemoryRegion::WORK, unique_memory_16b(work_ram, 64 * 1024));
-    SetMemory(MemoryRegion::PIVOT, unique_memory_16b(pivot_ram, 8 * 1024));
+    SetMemory(MemoryRegion::SHARE, unique_memory_16b(share_ram, 4 * 1024));
+    SetMemory(MemoryRegion::WORK, unique_memory_16b(work_ram, 32 * 1024));
     SetMemory(MemoryRegion::OBJ_EXT, unique_memory_8b_2(tc0200obj_extender, extension_ram, 8 * 1024));
     SetMemory(MemoryRegion::SOUND, unique_memory_8b(sound_ram, 64 * 1024));
     SetMemory(MemoryRegion::SOUND_ROM, unique_memory_8b(sound_ram, 128 * 1024));
     SetMemory(MemoryRegion::CPU_ROM, std::make_unique<MemorySlice>(*mSDRAM, CPU_ROM_SDR_BASE, 1024 * 1024));
     SetMemory(MemoryRegion::SCN0_ROM, std::make_unique<MemorySlice>(*mSDRAM, SCN0_ROM_SDR_BASE, 2048 * 1024));
-    SetMemory(MemoryRegion::SCN1_ROM, std::make_unique<MemorySlice>(*mSDRAM, SCN1_ROM_SDR_BASE, 2048 * 1024));
     SetMemory(MemoryRegion::OBJ_ROM, std::make_unique<MemorySlice>(*mDDRMemory, OBJ_DATA_DDR_BASE, 6 * 1024 * 1024));
 }
 

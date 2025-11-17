@@ -81,8 +81,8 @@ wire [15:0] cfg_addr_rom;
 wire [15:0] cfg_addr_rom1;
 wire [15:0] cfg_addr_extra_rom;
 wire [15:0] cfg_addr_work_ram;
+wire [15:0] cfg_addr_share_ram;
 wire [15:0] cfg_addr_screen0;
-wire [15:0] cfg_addr_screen1;
 wire [15:0] cfg_addr_obj;
 wire [15:0] cfg_addr_color;
 wire [15:0] cfg_addr_io0;
@@ -90,7 +90,6 @@ wire [15:0] cfg_addr_io1;
 wire [15:0] cfg_addr_sound;
 wire [15:0] cfg_addr_extension;
 wire [15:0] cfg_addr_priority;
-wire [15:0] cfg_addr_roz;
 wire [15:0] cfg_addr_cchip;
 
 wire [8:0] cfg_hofs_200obj /* verilator public_flat */,  cfg_vofs_200obj  /* verilator public_flat */;
@@ -126,8 +125,8 @@ game_board_config game_board_config(
     .cfg_addr_rom1,
     .cfg_addr_extra_rom,
     .cfg_addr_work_ram,
+    .cfg_addr_share_ram,
     .cfg_addr_screen0,
-    .cfg_addr_screen1,
     .cfg_addr_obj,
     .cfg_addr_color,
     .cfg_addr_io0,
@@ -135,7 +134,6 @@ game_board_config game_board_config(
     .cfg_addr_sound,
     .cfg_addr_extension,
     .cfg_addr_priority,
-    .cfg_addr_roz,
     .cfg_addr_cchip,
 
     .cfg_hofs_200obj, .cfg_vofs_200obj,
@@ -394,8 +392,8 @@ end
 
 logic ROMn; // CPU ROM
 logic WORKn; // CPU RAM
+logic SHAREn; // CPU RAM
 logic SCREEN0n;
-logic SCREEN1n;
 logic COLORn;
 logic IO0n, IO1n;
 logic OBJECTn;
@@ -403,7 +401,7 @@ logic PRIORITYn;
 logic SOUNDn /* verilator public_flat */;
 logic EXTENSIONn;
 logic CCHIPn;
-logic PIVOTn;
+logic PIVOTn = 1;
 logic GROWL_HACKn;
 logic EXTRA_ROMn; // CPU ROM "extra" region (ROMn will be asserted also)
 
@@ -542,25 +540,6 @@ logic [7:0] IN0, IN1, IN2;
 
 always_comb begin
     case(game)
-        GAME_KOSHIEN: begin
-            IN0 = { start[1], joystick_p2[6:4], start[0], joystick_p1[6:4] };
-            IN1 = { 4'b0000, coin[1:0], 2'b00 };
-            IN2 = { joystick_p2[0], joystick_p2[1], joystick_p2[2], joystick_p2[3], joystick_p1[0], joystick_p1[1], joystick_p1[2], joystick_p1[3] }; 
-        end
-
-        // Quiz controls
-        GAME_QTORIMON,
-        GAME_YUYUGOGO,
-        GAME_QZQUEST,
-        GAME_QZCHIKYU,
-        GAME_YESNOJ,
-        GAME_QJINSEI,
-        GAME_QCRAYON: begin
-            IN0 = { start[0], 1'b0, joystick_p1[9:4] };
-            IN1 = { start[1], 1'b0, joystick_p2[9:4] };
-            IN2 = { 4'b0000, coin[1:0], 2'b00 };
-        end
-
         default: begin
             IN0 = { start[0], joystick_p1[6:4], joystick_p1[0], joystick_p1[1], joystick_p1[2], joystick_p1[3] };
             IN1 = { start[1], joystick_p2[6:4], joystick_p2[0], joystick_p2[1], joystick_p2[2], joystick_p2[3] };
@@ -601,21 +580,12 @@ TC0220IOC tc0220ioc(
 logic [15:0] PAin, PBin, PCin;
 
 always_comb begin
-    if (game == GAME_QUIZHQ) begin
-        // DWSB, DWSA
-        PAin = { dswa, dswb };
-        // IN0, IN1
-        PBin = { start[0], 2'b00, joystick_p1[8:4], start[1], 2'b00, joystick_p2[8:4] };
-        // IN2
-        PCin = { 4'd0, coin[1:0], 2'd0, 8'h00 };
-    end else begin
-        // IN0, DSWA
-        PAin = { start[0], joystick_p1[6:4], joystick_p1[0], joystick_p1[1], joystick_p1[2], joystick_p1[3], dswa };
-        // IN1, DWSB
-        PBin = { start[1], joystick_p2[6:4], joystick_p2[0], joystick_p2[1], joystick_p2[2], joystick_p2[3], dswb };
-        // COIN, IN2
-        PCin = { 4'd0, coin[1:0], 2'd0, 8'h00};
-    end
+    // IN0, DSWA
+    PAin = { start[0], joystick_p1[6:4], joystick_p1[0], joystick_p1[1], joystick_p1[2], joystick_p1[3], dswa };
+    // IN1, DWSB
+    PBin = { start[1], joystick_p2[6:4], joystick_p2[0], joystick_p2[1], joystick_p2[2], joystick_p2[3], dswb };
+    // COIN, IN2
+    PCin = { 4'd0, coin[1:0], 2'd0, 8'h00};
 end
 
 TMP82C265 tmp82c265(
@@ -645,27 +615,15 @@ logic [7:0] te7750_p[10];
 
 always_comb begin
     te7750_p[0] = 0;
-    if (game == GAME_NINJAK) begin
-        te7750_p[1] = dswa;
-        te7750_p[2] = dswb;
-        te7750_p[3] = {start[0], joystick_p1[6:4], joystick_p1[0], joystick_p1[1], joystick_p1[2], joystick_p1[3]};
-        te7750_p[4] = {start[1], joystick_p2[6:4], joystick_p2[0], joystick_p2[1], joystick_p2[2], joystick_p2[3]};
-        te7750_p[5] = {start[2], joystick_p3[6:4], joystick_p3[0], joystick_p3[1], joystick_p3[2], joystick_p3[3]};
-        te7750_p[6] = {start[3], joystick_p4[6:4], joystick_p4[0], joystick_p4[1], joystick_p4[2], joystick_p4[3]};
-        te7750_p[7] = {coin[3:0], 4'd0};
-        te7750_p[8] = 0;
-        te7750_p[9] = 0;
-    end else begin
-        te7750_p[1] = dswa;
-        te7750_p[2] = dswb;
-        te7750_p[3] = {4'd0, coin[3:0]};
-        te7750_p[4] = 0;
-        te7750_p[5] = 0;
-        te7750_p[6] = {start[0], joystick_p1[6:4], joystick_p1[0], joystick_p1[1], joystick_p1[2], joystick_p1[3]};
-        te7750_p[7] = {start[1], joystick_p2[6:4], joystick_p2[0], joystick_p2[1], joystick_p2[2], joystick_p2[3]};
-        te7750_p[8] = {start[2], joystick_p3[6:4], joystick_p3[0], joystick_p3[1], joystick_p3[2], joystick_p3[3]};
-        te7750_p[9] = {start[3], joystick_p4[6:4], joystick_p4[0], joystick_p4[1], joystick_p4[2], joystick_p4[3]};
-     end
+    te7750_p[1] = dswa;
+    te7750_p[2] = dswb;
+    te7750_p[3] = {4'd0, coin[3:0]};
+    te7750_p[4] = 0;
+    te7750_p[5] = 0;
+    te7750_p[6] = {start[0], joystick_p1[6:4], joystick_p1[0], joystick_p1[1], joystick_p1[2], joystick_p1[3]};
+    te7750_p[7] = {start[1], joystick_p2[6:4], joystick_p2[0], joystick_p2[1], joystick_p2[2], joystick_p2[3]};
+    te7750_p[8] = {start[2], joystick_p3[6:4], joystick_p3[0], joystick_p3[1], joystick_p3[2], joystick_p3[3]};
+    te7750_p[9] = {start[3], joystick_p4[6:4], joystick_p4[0], joystick_p4[1], joystick_p4[2], joystick_p4[3]};
 end
 
 TE7750 te7750(
@@ -821,48 +779,14 @@ TC0200OBJ_Extender tc0200obj_extender(
     .ssb(ssb[10])
 );
 
-TC0190FMC #(.SS_IDX(SSIDX_190FMC)) tc0190fmc(
-    .clk,
-    .reset,
-    .cs(~EXTENSIONn),
-    .cpu_rw,
-    .cpu_ds_n(cpu_ds_n[0]),
-    .cpu_addr(cpu_addr[2:0]),
-    .cpu_din(cpu_data_out[7:0]),
-
-    .code_req(obj_code_modify_req),
-    .code_original(obj_code_original),
-    .code_modified(obj_code_modified_190fmc),
-
-    .ssbus(ssb[12])
-);
-
-TC0200OBJ_Koshien #(.SS_IDX(SSIDX_KOSHIEN)) tc0200obj_koshien(
-    .clk,
-
-    .cs_n(EXTENSIONn),
-    .cpu_ds_n(cpu_ds_n),
-    .cpu_rw(cpu_rw),
-    .din(cpu_data_out),
-
-    .code_original(obj_code_original),
-    .code_modified(obj_code_modified_koshien),
-
-    .ssb(ssb[19])
-);
-
-
-wire [7:0] dar_red, dar_green, dar_blue;
-wire dar_hblank_n, dar_vblank_n;
-
 assign hsync = global_hsync;
 assign vsync = global_vsync;
-assign hblank = cfg_260dar ? ~dar_hblank_n : global_hblank;
-assign vblank = cfg_260dar ? ~dar_vblank_n : global_vblank;
+assign hblank = global_hblank;
+assign vblank = global_vblank;
 
-assign blue = cfg_260dar ? dar_blue : {color_ram_q[14:10], color_ram_q[14:12]};
-assign green = cfg_260dar ? dar_green : {color_ram_q[9:5], color_ram_q[9:7]};
-assign red = cfg_260dar ? dar_red : {color_ram_q[4:0], color_ram_q[4:2]};
+assign blue = {color_ram_q[14:10], color_ram_q[14:12]};
+assign green = {color_ram_q[9:5], color_ram_q[9:7]};
+assign red = {color_ram_q[4:0], color_ram_q[4:2]};
 
 
 //////////////////////////////////
@@ -956,235 +880,6 @@ TC0100SCN #(.SS_IDX(SSIDX_SCN_0)) scn0(
     .ssbus(ssb[5])
 );
 
-//////////////////////////////////
-//// SCREEN 1 TC0100SCN
-wire [14:0] scn1_ram_addr;
-wire [15:0] scn1_data_out;
-wire [15:0] scn1_ram_data;
-wire scn1_ram_we_up_n, scn1_ram_we_lo_n;
-wire scn1_ram_ce_0_n, scn1_ram_ce_1_n;
-
-
-wire [14:0] scn_mux_ram_addr;
-wire [15:0] scn_mux_ram_data;
-wire [15:0] scn_mux_ram_q;
-wire scn_mux_ram_lds_n, scn_mux_ram_uds_n;
-
-m68k_ram #(.WIDTHAD(15)) scn_mux_ram(
-    .clock(clk),
-    .address(scn_mux_ram_addr),
-    .we_lds_n(scn_mux_ram_lds_n),
-    .we_uds_n(scn_mux_ram_uds_n),
-    .data(scn_mux_ram_data),
-    .q(scn_mux_ram_q)
-);
-
-m68k_ram_ss_adaptor #(.WIDTHAD(15), .SS_IDX(SSIDX_SCN_MUX_RAM)) scn_mux_ram_ss(
-    .clk,
-    .addr_in(cfg_100scn ? scn1_ram_addr : scp_ram_addr),
-    .lds_n_in(cfg_100scn ? (scn1_ram_ce_0_n | scn1_ram_we_lo_n) : (scp_ram_ce_n | scp_ram_we_lo_n)),
-    .uds_n_in(cfg_100scn ? (scn1_ram_ce_0_n | scn1_ram_we_up_n) : (scp_ram_ce_n | scp_ram_we_up_n)),
-    .data_in(cfg_100scn ? scn1_ram_data : scp_ram_data),
-
-    .q(scn_mux_ram_q),
-
-    .addr_out(scn_mux_ram_addr),
-    .lds_n_out(scn_mux_ram_lds_n),
-    .uds_n_out(scn_mux_ram_uds_n),
-    .data_out(scn_mux_ram_data),
-
-    .ssbus(ssb[16])
-);
-
-wire [14:0] scn1_dot_color;
-
-wire [20:0] scn1_rom_address;
-assign sdr_scn1_addr = SCN1_ROM_SDR_BASE[26:0] + { 6'b0, scn1_rom_address[20:0] };
-
-TC0100SCN #(.SS_IDX(SSIDX_SCN_1)) scn1(
-    .clk(clk),
-    .ce_13m(ce_13m),
-    .ce_pixel,
-
-    .reset,
-
-    // CPU interface
-    .VA(cpu_word_addr[17:0]),
-    .Din(cpu_data_out),
-    .Dout(scn1_data_out),
-    .LDSn(cpu_ds_n[0]),
-    .UDSn(cpu_ds_n[1]),
-    .SCCSn(cfg_100scn ? SCREEN1n : 1'b1),
-    .RW(cpu_rw),
-    .DACKn(SDTACK1n),
-
-    // RAM interface
-    .SA(scn1_ram_addr),
-    .SDin(scn_mux_ram_q),
-    .SDout(scn1_ram_data),
-    .WEUPn(scn1_ram_we_up_n),
-    .WELOn(scn1_ram_we_lo_n),
-    .SCE0n(scn1_ram_ce_0_n),
-    .SCE1n(scn1_ram_ce_1_n),
-
-    // ROM interface
-    .rom_address(scn1_rom_address),
-    .rom_req(sdr_scn1_req),
-    .rom_ack(sdr_scn_mux_ack),
-    .rom_data(sdr_scn_mux_q[31:0]),
-
-    // Video interface
-    .SC(scn1_dot_color),
-    .HSYNn(),
-    .HBLOn(),
-    .VSYNn(),
-    .VBLOn(),
-    .OLDH(),
-    .OLDV(),
-    .IHLD(global_hcnt == cfg_hofs_100scn1),
-    .IVLD(global_vcnt == cfg_vofs_100scn1),
-
-    .ssbus(ssb[17])
-);
-
-//////////////////////////////////
-//// SCREEN 1 TC0480SCP
-wire [14:0] scp_ram_addr;
-wire [15:0] scp_data_out;
-wire [15:0] scp_ram_data;
-wire scp_ram_we_up_n, scp_ram_we_lo_n;
-wire scp_ram_ce_n;
-
-wire [15:0] scp_dot_color;
-
-wire [22:0] scp_rom_address;
-
-assign sdr_scp_addr = SCN1_ROM_SDR_BASE[26:0] + { 4'b0, scp_rom_address[22:0] };
-
-TC0480SCP #(.SS_IDX(SSIDX_480SCP)) tc0480scp(
-    .clk(clk),
-    .ce(ce_pixel), // FIXME: scn0 should be authorative here
-
-    .reset,
-
-    // CPU interface
-    .VA(cpu_word_addr[17:0]),
-    .VDin(cpu_data_out),
-    .VDout(scp_data_out),
-    .LDSn(cpu_ds_n[0]),
-    .UDSn(cpu_ds_n[1]),
-    .CSn(cfg_480scp ? SCREEN1n : 1'b1),
-    .RW(cpu_rw),
-    .VDTACKn(VDTACKn),
-
-    // RAM interface
-    .RA(scp_ram_addr),
-    .RADOEn(scp_ram_ce_n),
-    .RADin(scn_mux_ram_q),
-    .RADout(scp_ram_data),
-    .RWAHn(scp_ram_we_up_n),
-    .RWALn(scp_ram_we_lo_n),
-
-    // ROM interface
-    .rom_address(scp_rom_address),
-    .rom_req(sdr_scp_req),
-    .rom_ack(sdr_scn_mux_ack),
-    .rom_data(sdr_scn_mux_q),
-
-    .devils_bit(game == GAME_METALB || game == GAME_METALBA),
-
-    // Video interface
-    .SD(scp_dot_color),
-    .HSYNn(),
-    .HBLNn(),
-    .VSYNn(),
-    .VBLNn(),
-    .HLDn(),
-    .VLDn(),
-    .OUHLDn(global_hcnt != cfg_hofs_480scp),
-    .OUVLDn(global_vcnt != cfg_vofs_480scp),
-
-    .ssbus(ssb[18])
-);
-
-
-
-wire [11:0] pivot_ram_addr;
-wire [15:0] pivot_ram_data;
-wire [15:0] pivot_ram_q;
-wire pivot_ram_we_up_n, pivot_ram_we_lo_n;
-
-wire [11:0] pivot_ram_addr1;
-wire [15:0] pivot_ram_data1;
-wire pivot_ram_lds_n, pivot_ram_uds_n;
-
-m68k_ram #(.WIDTHAD(12)) pivot_ram(
-    .clock(clk),
-    .address(pivot_ram_addr1),
-    .we_lds_n(pivot_ram_lds_n),
-    .we_uds_n(pivot_ram_uds_n),
-    .data(pivot_ram_data1),
-    .q(pivot_ram_q)
-);
-
-m68k_ram_ss_adaptor #(.WIDTHAD(12), .SS_IDX(SSIDX_PIVOT_RAM)) pivot_ram_ss(
-    .clk,
-    .addr_in(pivot_ram_addr),
-    .lds_n_in(pivot_ram_we_lo_n),
-    .uds_n_in(pivot_ram_we_up_n),
-    .data_in(pivot_ram_data),
-
-    .q(pivot_ram_q),
-
-    .addr_out(pivot_ram_addr1),
-    .lds_n_out(pivot_ram_lds_n),
-    .uds_n_out(pivot_ram_uds_n),
-    .data_out(pivot_ram_data1),
-
-    .ssbus(ssb[14])
-);
-
-
-wire [15:0] pivot_dout;
-wire [5:0] pivot_dot;
-
-TC0430GRW #(.SS_IDX(SSIDX_PIVOT_CTRL)) tc0430grw(
-    .clk,
-    .ce_13m,
-    .ce_pixel,
-
-    .reset,
-
-    .is_280grd(cfg_280grd),
-
-    .VA(cpu_addr[12:0]),
-    .Din(cpu_data_out),
-    .Dout(pivot_dout),
-    .LDSn(cpu_ds_n[0]),
-    .UDSn(cpu_ds_n[1]),
-    .SCCSn(PIVOTn),
-    .RW(cpu_rw),
-    .DACKn(pivot_dtack_n),
-
-    .SA(pivot_ram_addr),
-    .SDin(pivot_ram_q),
-    .SDout(pivot_ram_data),
-    .WEUPn(pivot_ram_we_up_n),
-    .WELOn(pivot_ram_we_lo_n),
-
-    .rom_address(sdr_pivot_addr),
-    .rom_data(sdr_scn_mux_q[15:0]),
-    .rom_req(sdr_pivot_req),
-    .rom_ack(sdr_scn_mux_ack),
-
-    .SC(pivot_dot),
-
-    .HBLANKn(global_hcnt != cfg_hofs_430grw),
-    .VBLANKn(global_vcnt != cfg_vofs_430grw),
-
-    .ssbus(ssb[15])
-);
-
 wire [15:0] color_ram_q;
 wire [15:0] color_ram_data;
 wire [13:0] color_ram_address;
@@ -1259,103 +954,6 @@ TC0110PR tc0110pr(
     .WEHn(pri_ram_we_h_n)
 );
 
-wire [12:0] pri360_color;
-wire [7:0] pri360_data_out;
-
-logic [14:0] color0_pri, color1_pri, color2_pri;
-
-always_comb begin
-    color1_pri = {obj_dot[11:10], 1'b0, obj_dot[11:0]};
-    if (cfg_480scp) begin
-        if (game == GAME_METALB || game == GAME_METALBA) begin
-            color0_pri = {{scp_dot_color[14], scp_dot_color[13]} - 2'b01, scp_dot_color[12:0]};
-            if (scp_dot_color[15:13] == 3'b101)
-                color2_pri = {2'b10, scp_dot_color[12:0]};
-            else
-                color2_pri = {2'b00, scp_dot_color[12:0]};
-        end else begin
-            color0_pri = {scp_dot_color[14], scp_dot_color[13], scp_dot_color[12:0]};
-            color2_pri = {scp_dot_color[15], scp_dot_color[13], scp_dot_color[12:0]};
-        end
-     end else begin
-        color0_pri = {scn0_dot_color[14:13], scn0_dot_color[12:0]};
-        if (cfg_100scn) begin
-            color2_pri = {scn1_dot_color[14:13], scn1_dot_color[12:0]};
-        end else if (cfg_430grw | cfg_280grd) begin
-            color2_pri = { 9'd0, pivot_dot };
-        end else begin
-            color2_pri = 15'd0;
-        end
-    end
-end
-
-TC0360PRI #(.SS_IDX(SSIDX_PRIORITY)) tc0360pri(
-    .clk,
-    .ce_pixel,
-    .reset,
-
-    .cpu_addr(cpu_addr[3:0]),
-    .cpu_din(cfg_360pri_high ? cpu_data_out[15:8] : cpu_data_out[7:0]),
-    .cpu_dout(pri360_data_out),
-    .cpu_ds_n(cfg_360pri_high ? cpu_ds_n[1] : cpu_ds_n[0]),
-    .cpu_rw,
-    .cs(~PRIORITYn),
-
-    .fullwidth(cfg_100scn | cfg_480scp),
-
-    .color_in0(color0_pri),
-    .color_in1(color1_pri),
-    .color_in2(color2_pri),
-    .color_out(pri360_color),
-
-    .ssbus(ssb[11])
-);
-
-TC0260DAR tc0260dar(
-    .clk,
-    .ce_pixel,
-    .ce_double(ce_13m),
-
-    .bpp15(cfg_bpp15),
-    .bppmix(cfg_bppmix),
-
-    // CPU Interface
-    .MDin(cpu_data_out),
-    .MDout(dar_data_out),
-
-    .MA(cpu_addr[13:0]),
-    .RWn(cpu_rw),
-    .UDSn(cpu_ds_n[1]),
-    .LDSn(cpu_ds_n[0]),
-
-    .CS(~COLORn),
-    .DTACKn(dar_dtack_n),
-
-    // FIXME : some boards can control this
-    .ACCMODE(~cfg_260dar_acc),
-
-    // Video Input
-    .HBLANKn(~global_hblank),
-    .VBLANKn(~global_vblank),
-    .OHBLANKn(dar_hblank_n),
-    .OVBLANKn(dar_vblank_n),
-
-    .IM(cfg_360pri ? { 1'b0, pri360_color[12:0] } : (|scn0_dot_color[3:0]) ? { 1'b0, scn0_dot_color[12:0] } : { 2'b00, obj_dot } ),
-
-    .VIDEOR(dar_red),
-    .VIDEOG(dar_green),
-    .VIDEOB(dar_blue),
-
-    // RAM Interface
-    .RA(dar_ram_addr),
-    .RDin(color_ram_q),
-    .RDout(dar_ram_dout),
-    .RWELn(dar_ram_we_l_n),
-    .RWEHn(dar_ram_we_h_n)
-);
-
-
-
 //////////////////////////////////
 //// Interrupt Processing
 wire ICLR1n = ~(~IACKn & (cpu_addr[2:0] == 3'b101) & ~cpu_ds_n[0]);
@@ -1365,8 +963,8 @@ reg int_req1, int_req2;
 reg vbl_prev_n, dma_prev_n;
 
 assign IPLn = ss_irq ? ~3'b111 :
-              int_req2 ? ~3'b110 :
-              int_req1 ? ~3'b101 :
+              int_req2 ? ~3'b101 :
+              int_req1 ? ~3'b100 :
               ~3'b000;
 
 always_ff @(posedge clk) begin
@@ -1407,8 +1005,8 @@ address_translator address_translator(
     .cfg_addr_rom1,
     .cfg_addr_extra_rom,
     .cfg_addr_work_ram,
+    .cfg_addr_share_ram,
     .cfg_addr_screen0,
-    .cfg_addr_screen1,
     .cfg_addr_obj,
     .cfg_addr_color,
     .cfg_addr_io0,
@@ -1416,14 +1014,13 @@ address_translator address_translator(
     .cfg_addr_sound,
     .cfg_addr_extension,
     .cfg_addr_priority,
-    .cfg_addr_roz,
     .cfg_addr_cchip,
 
     .WORKn,
     .ROMn,
+    .SHAREn,
     .EXTRA_ROMn,
     .SCREEN0n,
-    .SCREEN1n,
     .COLORn,
     .IO0n,
     .IO1n,
@@ -1433,7 +1030,6 @@ address_translator address_translator(
     .GROWL_HACKn,
     .EXTENSIONn,
     .CCHIPn,
-    .PIVOTn,
 
     .SS_SAVEn,
     .SS_RESETn,
@@ -1445,17 +1041,15 @@ assign cpu_data_in = ~SS_SAVEn ? ss_irq_handler[cpu_addr[3:0]] :
                      ~SS_VECn ? ( cpu_addr[0] ? 16'h0000 : 16'h00ff ) :
                      ~ROMn ? rom_q :
                      ~WORKn ? workram_q :
+                     ~SHAREn ? shareram_q :
                      ~SCREEN0n ? scn0_data_out :
-                     ~SCREEN1n ? ( cfg_100scn ? scn1_data_out : scp_data_out ) :
                      ~OBJECTn ? objram_data_out :
-                     ~PRIORITYn ? { pri360_data_out, pri360_data_out } :
-                     ~COLORn ? (cfg_260dar ? dar_data_out : pri_data_out) :
+                     ~COLORn ? pri_data_out :
                      (~IO0n | ~IO1n) ? { io_data_out, io_data_out } :
                      ~SOUNDn ? { 4'd0, syt_cpu_dout, 8'd0 } :
                      ~EXTENSIONn ? extension_data :
                      ~GROWL_HACKn ? growl_hack_data :
                      ~CCHIPn ? { 8'h00, cchip_data } :
-                     ~PIVOTn ? { pivot_dout } :
                      16'd0;
 
 wire [14:0] workram_addr;
@@ -1487,6 +1081,37 @@ m68k_ram_ss_adaptor #(.WIDTHAD(15), .SS_IDX(SSIDX_CPU_RAM)) workram_ss(
 
     .ssbus(ssb[1])
 );
+
+wire [11:0] shareram_addr;
+wire shareram_lds_n, shareram_uds_n;
+wire [15:0] shareram_data, shareram_q;
+
+m68k_ram #(.WIDTHAD(12)) share_ram(
+    .clock(clk),
+    .address(shareram_addr),
+    .we_lds_n(shareram_lds_n),
+    .we_uds_n(shareram_uds_n),
+    .data(shareram_data),
+    .q(shareram_q)
+);
+
+m68k_ram_ss_adaptor #(.WIDTHAD(12), .SS_IDX(SSIDX_SHARE_RAM)) shareram_ss(
+    .clk,
+    .addr_in(cpu_addr[11:0]),
+    .lds_n_in(SHAREn | cpu_ds_n[0] | cpu_rw),
+    .uds_n_in(SHAREn | cpu_ds_n[1] | cpu_rw),
+    .data_in(cpu_data_out),
+
+    .q(shareram_q),
+
+    .addr_out(shareram_addr),
+    .lds_n_out(shareram_lds_n),
+    .uds_n_out(shareram_uds_n),
+    .data_out(shareram_data),
+
+    .ssbus(ssb[1])
+);
+
 
 reg prev_ds_n;
 
