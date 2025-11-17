@@ -784,9 +784,9 @@ assign vsync = global_vsync;
 assign hblank = global_hblank;
 assign vblank = global_vblank;
 
-assign blue = {color_ram_q[14:10], color_ram_q[14:12]};
-assign green = {color_ram_q[9:5], color_ram_q[9:7]};
-assign red = {color_ram_q[4:0], color_ram_q[4:2]};
+assign blue = {color_ram_q[11:8], color_ram_q[11:8]};
+assign green = {color_ram_q[7:4], color_ram_q[7:4]};
+assign red = {color_ram_q[3:0], color_ram_q[3:0]};
 
 
 //////////////////////////////////
@@ -907,10 +907,10 @@ wire dar_ram_we_l_n, dar_ram_we_h_n;
 
 m68k_ram_ss_adaptor #(.WIDTHAD(14), .SS_IDX(SSIDX_COLOR_RAM)) color_ram_ss(
     .clk,
-    .addr_in(cfg_260dar ? dar_ram_addr : {2'b0, pri_ram_addr[12:1]}),
-    .lds_n_in(cfg_260dar ? dar_ram_we_l_n : pri_ram_we_l_n),
-    .uds_n_in(cfg_260dar ? dar_ram_we_h_n : pri_ram_we_h_n),
-    .data_in(cfg_260dar ? dar_ram_dout : pri_ram_dout),
+    .addr_in({2'b0, pri_ram_addr[12:1]}),
+    .lds_n_in(pri_ram_we_l_n),
+    .uds_n_in(pri_ram_we_h_n),
+    .data_in(pri_ram_dout),
 
     .q(color_ram_q),
 
@@ -956,8 +956,8 @@ TC0110PR tc0110pr(
 
 //////////////////////////////////
 //// Interrupt Processing
-wire ICLR1n = ~(~IACKn & (cpu_addr[2:0] == 3'b101) & ~cpu_ds_n[0]);
-wire ICLR2n = ~(~IACKn & (cpu_addr[2:0] == 3'b110) & ~cpu_ds_n[0]);
+wire ICLR1n = ~(~IACKn & (cpu_addr[2:0] == 3'b100) & ~cpu_ds_n[0]);
+wire ICLR2n = ~(~IACKn & (cpu_addr[2:0] == 3'b101) & ~cpu_ds_n[0]);
 
 reg int_req1, int_req2;
 reg vbl_prev_n, dma_prev_n;

@@ -64,8 +64,8 @@ always_ff @(posedge clk) begin
         end else begin
             case(VA)
                 2'b00: begin
-                    if (~UDSn) cpu_addr[12:8] <= Din[12:8];
-                    if (~LDSn) cpu_addr[7:0] <= Din[7:0];
+                    if (~UDSn) cpu_addr[12:8] <= Din[11:7];
+                    if (~LDSn) cpu_addr[7:0] <= {Din[6:0], 1'b0};
                     dtack_n <= 0;
                     cpu_mode <= 1;
                 end

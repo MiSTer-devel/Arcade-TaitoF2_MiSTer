@@ -1,15 +1,11 @@
 [regions]
 maincpu = 0
-tc0100scn_1 = 1
+tc0100scn = 1
 sprites.id = 2
 sprites.swap = true
 audiocpu = 3
 "ymsnd:adpcma" = 4
 "ymsnd:adpcmb" = 5
-tc0430grw = 6
-tc0280grd = 6
-tc0100scn_2 = 7
-tc0480scp = 7
 extra = 8
 
 [machines]
