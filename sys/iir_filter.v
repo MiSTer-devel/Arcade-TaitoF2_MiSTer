@@ -51,12 +51,10 @@ module IIR_filter
 	output [15:0] output_l, output_r  // signed samples
 );
 
-/* verilator lint_off REALCVT */
 localparam  [39:0] pcoeff_x  = coeff_x  * 40'h8000000000;
 localparam  [31:0] pcoeff_y0 = coeff_y0 * 24'h200000;
 localparam  [31:0] pcoeff_y1 = coeff_y1 * 24'h200000;
 localparam  [31:0] pcoeff_y2 = coeff_y2 * 24'h200000;
-/* verilator lint_on REALCVT */
 
 wire [39:0] vcoeff    = use_params ? pcoeff_x        : cx;
 wire [23:0] vcoeff_y0 = use_params ? pcoeff_y0[23:0] : cy0;
